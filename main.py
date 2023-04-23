@@ -6,6 +6,7 @@ from wakeword import listen_for_wakeword
 import numpy as np
 import time
 from collections import deque
+import re
 
 SILENCE_THRESHOLD = 200
 SILENCE_DURATION = 2
@@ -37,8 +38,6 @@ def record_audio():
     CHANNELS = 1  # Mono
     RATE = 16000  # Sample rate (Hz)
     CHUNK = 1024  # Buffer size (in samples)
-    # TODO obv biggest improvement is flexible recording duration...
-    RECORD_SECONDS = 10  # Duration of recording (seconds)
     OUTPUT_FILENAME = "output.wav"  # Output file name
 
     # Create a PyAudio object
@@ -85,7 +84,7 @@ def whisper(filename):
 
 
 def sanitize_transciption(text):
-    text = text.replace('[BLANK AUDIO]', '')
+    text = re.sub(r'\[BLANK.AUDIO\]', '', text)
     lines = text.split('\n')
 
     deduped = [lines[0]]
@@ -103,6 +102,7 @@ def tts(text):
 while True:
     listen_for_wakeword()
     print('wakeword detected!')
+    tts('boop')
     record_audio()
     speech = whisper('output.wav')
     print('raw', speech)
